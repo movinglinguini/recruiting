@@ -1,43 +1,17 @@
 import { Form, FormField, FormLabel } from '@radix-ui/react-form';
-import { Button, Card, Flex, Heading, Separator, TextField } from '@radix-ui/themes';
+import { Button, Card, Container, Flex, Heading, Separator, TextField } from '@radix-ui/themes';
 import _ from 'lodash';
-import React, { useCallback, useState } from 'react';
+import React, { FormEvent, FormEventHandler, memo, useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Routes } from 'routes';
+import { FormData, FormValue } from 'types/formData';
 
-type FormValue = number | '';
-interface FormData {
-  Body1: {
-    position: {
-      x: FormValue;
-      y: FormValue;
-      z: FormValue;
-    }
-    velocity: {
-      x: FormValue;
-      y: FormValue;
-      z: FormValue;
-    }
-    mass: FormValue;
-  };
-  Body2: {
-    position: {
-      x: FormValue;
-      y: FormValue;
-      z: FormValue;
-    }
-    velocity: {
-      x: FormValue;
-      y: FormValue;
-      z: FormValue;
-    }
-    mass: FormValue;
-  };
+export type SimulateFormProps = {
+  isLoading: boolean,
+  onSubmitForm: (formData : FormData) => void,
 }
 
-const SimulateForm: React.FC = () => {
-  const navigate = useNavigate();
-
+const SimulateForm = memo(({ isLoading, onSubmitForm } : SimulateFormProps) => {
   const [formData, setFormData] = useState<FormData>({
     Body1: { position: {x: -0.73, y: 0, z: 0}, velocity: {x: 0, y: -0.0015, z: 0}, mass: 1 },
     Body2: { position: {x: 60.34, y: 0, z: 0}, velocity: {x: 0, y: 0.13, z: 0}, mass: 0.0123 },
@@ -49,47 +23,19 @@ const SimulateForm: React.FC = () => {
     setFormData((prev) => _.set({ ...prev }, name, newValue));
   }, []);
 
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-      try {
-        const response = await fetch('http://localhost:8000/simulation', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        });
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        navigate(Routes.SIMULATION);
-      } catch (error) {
-        console.error('Error:', error);
-      }
-    },
-    [formData]
-  );
+  const handleSubmit = useCallback((evt: FormEvent) => {
+    evt.preventDefault();
+    onSubmitForm(formData);
+  }, [formData]);
 
   return (
-    <div
-      style={{
-        position: 'absolute',
-        top: '5%',
-        left: 'calc(50% - 200px)',
-        overflow: 'scroll',
-      }}
+    <Container
     >
       {/* Card: https://www.radix-ui.com/themes/docs/components/card */}
-      <Card
-        style={{
-          width: '400px',
-        }}
-      >
+      <>
         <Heading as="h2" size="4" weight="bold" mb="4">
           Run a Simulation
         </Heading>
-        <Link to={Routes.SIMULATION}>View previous simulation</Link>
         <Separator size="4" my="5" />
         <Form onSubmit={handleSubmit}>
           {/* 
@@ -264,12 +210,12 @@ const SimulateForm: React.FC = () => {
             />
           </FormField>
           <Flex justify="center" m="5">
-            <Button type="submit">Submit</Button>
+            <Button type="submit" disabled={isLoading}>Submit</Button>
           </Flex>
         </Form>
-      </Card>
-    </div>
+      </>
+    </Container>
   );
-};
+});
 
 export default SimulateForm;
