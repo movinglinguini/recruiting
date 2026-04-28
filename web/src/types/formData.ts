@@ -1,29 +1,17 @@
 export type FormValue = number | '';
-export type FormData = {
-  Body1: {
-    position: {
-      x: FormValue;
-      y: FormValue;
-      z: FormValue;
-    }
-    velocity: {
-      x: FormValue;
-      y: FormValue;
-      z: FormValue;
-    }
-    mass: FormValue;
+
+export type BodyData = {
+  position: {
+    x: FormValue;
+    y: FormValue;
+    z: FormValue;
   };
-  Body2: {
-    position: {
-      x: FormValue;
-      y: FormValue;
-      z: FormValue;
-    }
-    velocity: {
-      x: FormValue;
-      y: FormValue;
-      z: FormValue;
-    }
-    mass: FormValue;
+  velocity: {
+    x: FormValue;
+    y: FormValue;
+    z: FormValue;
   };
-}
+  mass: FormValue;
+};
+
+export type FormData = Record<string, BodyData>;

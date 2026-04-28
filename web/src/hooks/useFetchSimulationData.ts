@@ -77,6 +77,7 @@ export function useFetchSimulationData(formData: FormData | null, callback : (da
     let canceled = false;
 
     if (!formData) {
+      callback(null);
       return () => {};
     }
 

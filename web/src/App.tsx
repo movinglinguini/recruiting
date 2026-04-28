@@ -6,6 +6,7 @@ import SimulateForm from 'components/SimulateForm';
 import { SimulationData } from 'types/data';
 import { LoadingMessage } from 'components/LoadingMessage';
 import { FormData } from 'types/formData';
+import _ from 'lodash';
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,14 +21,16 @@ const App = () => {
       setSimulationData(simulationData);
     } else {
       setHasError(true);
+      setSimulationData(null);
     }
     setIsLoading(false);
   });
 
-  const onSubmitForm = useCallback((formData: FormData) => {
-    setFormData(formData);
+  const onSubmitForm = useCallback((next: FormData) => {
+    if (_.isEqual(next, formData)) return;
+    setFormData(next);
     setIsLoading(true);
-  }, []);
+  }, [formData]);
 
   return (
     <Flex direction="column" style={{ height: '100vh', overflow: 'hidden' }}>
@@ -44,11 +47,10 @@ const App = () => {
           </Box>
           <Box width="85%" height="100%" p="3" style={{ overflowY: 'auto' }}>
             {
-              simulationData ?
-                <SimulationViewer simulationData={simulationData}/>
-              : (
-                isLoading ?
+              isLoading ?
                   <LoadingMessage/>
+              : (
+                simulationData ? <SimulationViewer simulationData={simulationData}/>
                 : (
                   hasError ?
                     <Text>An error occurred while fetching the simulation data.</Text>

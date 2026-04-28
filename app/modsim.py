@@ -4,15 +4,23 @@ from random import random
 
 import numpy as np
 
-def propagate_velocity(time_step, position, velocity, other_position, m_other):
-    """Propagate the velocity of the agent from `time` to `time + timeStep`."""
-    # Use law of gravitation to update velocity
+def propagate_velocity(time_step, position, velocity, *others):
+    """Propagate the velocity of the agent from `time` to `time + timeStep`.
+
+    `others` is a flat, alternating sequence of (position, mass) for every other
+    agent — produced by the consumed-query template in `build_agents`.
+    """
     r_self = np.array([position['x'], position['y'], position['z']])
     v_self = np.array([velocity['x'], velocity['y'], velocity['z']])
-    r_other = np.array([other_position['x'], other_position['y'], other_position['z']])
 
-    r = r_self - r_other
-    dvdt = -m_other * r / np.linalg.norm(r)**3
+    dvdt = np.zeros(3)
+    for i in range(0, len(others), 2):
+        other_position = others[i]
+        m_other = others[i + 1]
+        r_other = np.array([other_position['x'], other_position['y'], other_position['z']])
+        r = r_self - r_other
+        dvdt += -m_other * r / np.linalg.norm(r)**3
+
     v_self = v_self + dvdt * time_step
 
     return {'x': v_self[0], 'y': v_self[1], 'z': v_self[2]}
@@ -53,92 +61,65 @@ Query syntax:
 - `<query>.<name>` will evaluate `query` and then look up `name` in the resulting dictionary.
 '''
 
-agents = {
-    'Body1': [
-        {
-            'consumed': '''(
-                prev!(velocity),
-            )''',
-            'produced': '''velocity''',
-            'function': identity,
-        },
-        {
-            'consumed': '''(
-                prev!(timeStep),
-                prev!(position),
-                velocity,
-            )''',
-            'produced': '''position''',
-            'function': propagate_position,
-        },
-        {
-            'consumed': '''(
-                prev!(mass),
-            )''',
-            'produced': '''mass''',
-            'function': propagate_mass,
-        },
-        {
-            'consumed': '''(
-                prev!(time),
-                timeStep
-            )''',
-            'produced': '''time''',
-            'function': time_manager,
-        },
-        {
-            'consumed': '''(
-                velocity,
-            )''',
-            'produced': '''timeStep''',
-            'function': timestep_manager,
-        }
-    ],
-    'Body2': [
-        {
-            'consumed': '''(
-                prev!(timeStep),
-                prev!(position),
-                prev!(velocity),
-                agent!(Body1).position,
-                agent!(Body1).mass,
-            )''',
-            'produced': '''velocity''',
-            'function': propagate_velocity,
-        },
-        {
-            'consumed': '''(
-                prev!(timeStep),
-                prev!(position),
-                velocity,
-            )''',
-            'produced': '''position''',
-            'function': propagate_position,
-        },
-        {
-            'consumed': '''(
-                prev!(mass),
-            )''',
-            'produced': '''mass''',
-            'function': propagate_mass,
-        },
-        {
-            'consumed': '''(
-                prev!(time),
-                timeStep
-            )''',
-            'produced': '''time''',
-            'function': time_manager,
-        },
-        {
-            'consumed': '''(
-                velocity,
-            )''',
-            'produced': '''timeStep''',
-            'function': timestep_manager,
-        }
-    ]
-}
+def build_agents(agent_ids):
+    """Build the per-agent state-manager spec for an arbitrary set of bodies.
+
+    Every body feels gravity from every other body (full pairwise N-body),
+    so the velocity state manager's consumed query lists each other agent's
+    position and mass alongside the agent's own prev state.
+    """
+    agents = {}
+    for agent_id in agent_ids:
+        others = [other for other in agent_ids if other != agent_id]
+        velocity_consumed_lines = [
+            'prev!(timeStep),',
+            'prev!(position),',
+            'prev!(velocity),',
+        ]
+        for other in others:
+            velocity_consumed_lines.append(f'agent!({other}).position,')
+            velocity_consumed_lines.append(f'agent!({other}).mass,')
+        velocity_consumed = '(\n    ' + '\n    '.join(velocity_consumed_lines) + '\n)'
+
+        agents[agent_id] = [
+            {
+                'consumed': velocity_consumed,
+                'produced': '''velocity''',
+                'function': propagate_velocity,
+            },
+            {
+                'consumed': '''(
+                    prev!(timeStep),
+                    prev!(position),
+                    velocity,
+                )''',
+                'produced': '''position''',
+                'function': propagate_position,
+            },
+            {
+                'consumed': '''(
+                    prev!(mass),
+                )''',
+                'produced': '''mass''',
+                'function': propagate_mass,
+            },
+            {
+                'consumed': '''(
+                    prev!(time),
+                    timeStep
+                )''',
+                'produced': '''time''',
+                'function': time_manager,
+            },
+            {
+                'consumed': '''(
+                    velocity,
+                )''',
+                'produced': '''timeStep''',
+                'function': timestep_manager,
+            },
+        ]
+    return agents
 
 # NOTE: initial values are set here. we intentionally separate the data from the functions operating on it.
 data = {

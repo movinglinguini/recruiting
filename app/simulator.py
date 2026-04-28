@@ -5,7 +5,7 @@ from operator import __or__
 import subprocess
 import json
 
-from modsim import agents
+from modsim import build_agents
 from store import QRangeStore
 
 def parse_query(query):
@@ -45,7 +45,7 @@ class Simulator:
         self.init = init
         self.times = {agentId: state["time"] for agentId, state in init.items()}
         self.sim_graph = {}
-        for (agentId, sms) in agents.items():
+        for (agentId, sms) in build_agents(list(init.keys())).items():
             agent = []
             for sm in sms:
                 consumed = parse_query(sm["consumed"])["content"]
