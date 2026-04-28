@@ -1,4 +1,4 @@
-import { Container, Flex, Heading, Separator, Spinner, Table } from '@radix-ui/themes';
+import { Container, Flex, Spinner, Table } from '@radix-ui/themes';
 import { useFetchSimulationData } from 'hooks/useFetchSimulationData';
 import { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
@@ -16,14 +16,16 @@ export function SimulationViewer({ simulationData } : SimulationViewerProps){
   const initialState = simulationData.data[0][2];
 
   return (
-    <Flex direction="column" m="4" width="100%" justify="center" align="center">
-      <Heading as="h1" size="8" weight="bold" mb="4">
-        Simulation Data
-      </Heading>
-      <Separator size="4" my="5" />
+    <Flex direction="column" m="4" justify="center" align="center">
       <Flex direction="row" width="100%" justify="center">
         <Plot
-          style={{ width: '45%', height: '100%', margin: '5px' }}
+          style={{
+            width: '45%',
+            height: '100%',
+            margin: '5px',
+            border: '1px solid var(--gray-a5)',
+            borderRadius: 'var(--radius-3)',
+          }}
           data={positionData}
           layout={{
             title: 'Position',
@@ -41,7 +43,13 @@ export function SimulationViewer({ simulationData } : SimulationViewerProps){
           }}
         />
         <Plot
-          style={{ width: '45%', height: '100%', margin: '5px' }}
+          style={{
+            width: '45%',
+            height: '100%',
+            margin: '5px',
+            border: '1px solid var(--gray-a5)',
+            borderRadius: 'var(--radius-3)',
+          }}
           data={velocityData}
           layout={{
             title: 'Velocity',

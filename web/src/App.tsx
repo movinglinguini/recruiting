@@ -1,4 +1,4 @@
-import { Box, Card, Flex, Grid, Heading, Section, Text } from '@radix-ui/themes';
+import { Box, Flex, Heading, Section, Text } from '@radix-ui/themes';
 import { SimulationViewer } from 'components/SimulationViewer';
 import { useFetchSimulationData } from 'hooks/useFetchSimulationData';
 import { useCallback, useState } from 'react';;
@@ -30,41 +30,36 @@ const App = () => {
   }, []);
 
   return (
-    <>
-      <Section height="10%" p="1rem">
+    <Flex direction="column" style={{ height: '100vh', overflow: 'hidden' }}>
+      <Section p="1rem" flexShrink="0">
         <Flex>
           <img src="/favicon.ico"/>
           <Heading as="h1" size="8" style={{ marginLeft: "1rem" }}>Sedaro Nano</Heading>
         </Flex>
       </Section>
-      <Section p="0">
-        <Flex width="100%">
-          <Box width="15%">
-            <Card>
-              <SimulateForm isLoading={isLoading} onSubmitForm={onSubmitForm}/>
-            </Card>
+      <Section p="0" style={{ flex: 1, minHeight: 0 }}>
+        <Flex width="100%" height="100%">
+          <Box width="15%" height="100%" p="3" style={{ overflowY: 'auto' }}>
+            <SimulateForm isLoading={isLoading} onSubmitForm={onSubmitForm}/>
           </Box>
-          <Box width="85%" maxHeight="75vh">
-            <Card>
-              {
-                simulationData ? 
-                  <SimulationViewer simulationData={simulationData}/>
+          <Box width="85%" height="100%" p="3" style={{ overflowY: 'auto' }}>
+            {
+              simulationData ?
+                <SimulationViewer simulationData={simulationData}/>
+              : (
+                isLoading ?
+                  <LoadingMessage/>
                 : (
-                  isLoading ? 
-                    <LoadingMessage/>
-                  : (
-                    hasError ? 
-                      <Text>An error occurred while fetching the simulation data.</Text>
-                    : <Text>Run a simulation.</Text>
-                  )
+                  hasError ?
+                    <Text>An error occurred while fetching the simulation data.</Text>
+                  : <Text>Run a simulation.</Text>
                 )
-              }
-            </Card>
+              )
+            }
           </Box>
         </Flex>
       </Section>
-
-    </>
+    </Flex>
   );
 };
 

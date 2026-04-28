@@ -1,5 +1,5 @@
 import { Form, FormField, FormLabel } from '@radix-ui/react-form';
-import { Button, Card, Container, Flex, Heading, Separator, TextField } from '@radix-ui/themes';
+import { Button, Card, Container, Flex, Heading, Text, TextField } from '@radix-ui/themes';
 import _ from 'lodash';
 import React, { FormEvent, FormEventHandler, memo, useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -33,22 +33,18 @@ const SimulateForm = memo(({ isLoading, onSubmitForm } : SimulateFormProps) => {
     >
       {/* Card: https://www.radix-ui.com/themes/docs/components/card */}
       <>
-        <Heading as="h2" size="4" weight="bold" mb="4">
-          Run a Simulation
-        </Heading>
-        <Separator size="4" my="5" />
         <Form onSubmit={handleSubmit}>
-          {/* 
+          {/*
             *********************************
             Body1
             *********************************
             */}
-          <Heading as="h3" size="3" weight="bold">
+          <Heading as="h2" size="4" weight="bold">
             Body1
           </Heading>
           {/* Form: https://www.radix-ui.com/primitives/docs/components/form */}
           <FormField name="Body1.position.x">
-            <FormLabel htmlFor="Body1.position.x">Initial X-position</FormLabel>
+            <FormLabel htmlFor="Body1.position.x"><Text size="1" color="gray">Initial X-position</Text></FormLabel>
             <TextField.Root
               type="number"
               id="Body1.position.x"
@@ -59,7 +55,7 @@ const SimulateForm = memo(({ isLoading, onSubmitForm } : SimulateFormProps) => {
             />
           </FormField>
           <FormField name="Body1.position.y">
-            <FormLabel htmlFor="Body1.position.y">Initial Y-position</FormLabel>
+            <FormLabel htmlFor="Body1.position.y"><Text size="1" color="gray">Initial Y-position</Text></FormLabel>
             <TextField.Root
               type="number"
               id="Body1.position.y"
@@ -70,7 +66,7 @@ const SimulateForm = memo(({ isLoading, onSubmitForm } : SimulateFormProps) => {
             />
           </FormField>
           <FormField name="Body1.position.z">
-            <FormLabel htmlFor="Body1.position.z">Initial Z-position</FormLabel>
+            <FormLabel htmlFor="Body1.position.z"><Text size="1" color="gray">Initial Z-position</Text></FormLabel>
             <TextField.Root
               type="number"
               id="Body1.position.z"
@@ -81,7 +77,7 @@ const SimulateForm = memo(({ isLoading, onSubmitForm } : SimulateFormProps) => {
             />
           </FormField>
           <FormField name="Body1.velocity.x">
-            <FormLabel htmlFor="Body1.velocity.x">Initial X-velocity</FormLabel>
+            <FormLabel htmlFor="Body1.velocity.x"><Text size="1" color="gray">Initial X-velocity</Text></FormLabel>
             <TextField.Root
               type="number"
               id="Body1.velocity.x"
@@ -92,7 +88,7 @@ const SimulateForm = memo(({ isLoading, onSubmitForm } : SimulateFormProps) => {
             />
           </FormField>
           <FormField name="Body1.velocity.y">
-            <FormLabel htmlFor="Body1.velocity.y">Initial Y-velocity</FormLabel>
+            <FormLabel htmlFor="Body1.velocity.y"><Text size="1" color="gray">Initial Y-velocity</Text></FormLabel>
             <TextField.Root
               type="number"
               id="Body1.velocity.y"
@@ -103,7 +99,7 @@ const SimulateForm = memo(({ isLoading, onSubmitForm } : SimulateFormProps) => {
             />
           </FormField>
           <FormField name="Body1.velocity.z">
-            <FormLabel htmlFor="Body1.velocity.z">Initial Z-velocity</FormLabel>
+            <FormLabel htmlFor="Body1.velocity.z"><Text size="1" color="gray">Initial Z-velocity</Text></FormLabel>
             <TextField.Root
               type="number"
               id="Body1.velocity.z"
@@ -114,7 +110,7 @@ const SimulateForm = memo(({ isLoading, onSubmitForm } : SimulateFormProps) => {
             />
           </FormField>
           <FormField name="Body1.mass">
-            <FormLabel htmlFor="Body1.mass">Mass</FormLabel>
+            <FormLabel htmlFor="Body1.mass"><Text size="1" color="gray">Mass</Text></FormLabel>
             <TextField.Root
               type="number"
               id="Body1.mass"
@@ -129,11 +125,11 @@ const SimulateForm = memo(({ isLoading, onSubmitForm } : SimulateFormProps) => {
             Body2
             *********************************
              */}
-          <Heading as="h3" size="3" weight="bold" mt="4">
+          <Heading as="h2" size="4" weight="bold" mt="4">
             Body2
           </Heading>
           <FormField name="Body2.position.x">
-            <FormLabel htmlFor="Body2.position.x">Initial X-position</FormLabel>
+            <FormLabel htmlFor="Body2.position.x"><Text size="1" color="gray">Initial X-position</Text></FormLabel>
             <TextField.Root
               type="number"
               id="Body2.position.x"
@@ -144,7 +140,7 @@ const SimulateForm = memo(({ isLoading, onSubmitForm } : SimulateFormProps) => {
             />
           </FormField>
           <FormField name="Body2.position.y">
-            <FormLabel htmlFor="Body2.position.y">Initial Y-position</FormLabel>
+            <FormLabel htmlFor="Body2.position.y"><Text size="1" color="gray">Initial Y-position</Text></FormLabel>
             <TextField.Root
               type="number"
               id="Body2.position.y"
@@ -155,7 +151,7 @@ const SimulateForm = memo(({ isLoading, onSubmitForm } : SimulateFormProps) => {
             />
           </FormField>
           <FormField name="Body2.position.z">
-            <FormLabel htmlFor="Body2.position.z">Initial Z-position</FormLabel>
+            <FormLabel htmlFor="Body2.position.z"><Text size="1" color="gray">Initial Z-position</Text></FormLabel>
             <TextField.Root
               type="number"
               id="Body2.position.z"
@@ -166,7 +162,7 @@ const SimulateForm = memo(({ isLoading, onSubmitForm } : SimulateFormProps) => {
             />
           </FormField>
           <FormField name="Body2.velocity.x">
-            <FormLabel htmlFor="Body2.velocity.x">Initial X-velocity</FormLabel>
+            <FormLabel htmlFor="Body2.velocity.x"><Text size="1" color="gray">Initial X-velocity</Text></FormLabel>
             <TextField.Root
               type="number"
               id="Body2.velocity.x"
@@ -177,7 +173,7 @@ const SimulateForm = memo(({ isLoading, onSubmitForm } : SimulateFormProps) => {
             />
           </FormField>
           <FormField name="Body2.velocity.y">
-            <FormLabel htmlFor="Body2.velocity.y">Initial Y-velocity</FormLabel>
+            <FormLabel htmlFor="Body2.velocity.y"><Text size="1" color="gray">Initial Y-velocity</Text></FormLabel>
             <TextField.Root
               type="number"
               id="Body2.velocity.y"
@@ -188,7 +184,7 @@ const SimulateForm = memo(({ isLoading, onSubmitForm } : SimulateFormProps) => {
             />
           </FormField>
           <FormField name="Body2.velocity.z">
-            <FormLabel htmlFor="Body2.velocity.z">Initial Z-velocity</FormLabel>
+            <FormLabel htmlFor="Body2.velocity.z"><Text size="1" color="gray">Initial Z-velocity</Text></FormLabel>
             <TextField.Root
               type="number"
               id="Body2.velocity.z"
@@ -199,7 +195,7 @@ const SimulateForm = memo(({ isLoading, onSubmitForm } : SimulateFormProps) => {
             />
           </FormField>
           <FormField name="Body2.mass">
-            <FormLabel htmlFor="Body2.mass">Mass</FormLabel>
+            <FormLabel htmlFor="Body2.mass"><Text size="1" color="gray">Mass</Text></FormLabel>
             <TextField.Root
               type="number"
               id="Body2.mass"
