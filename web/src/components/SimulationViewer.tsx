@@ -1,22 +1,38 @@
-import { Container, Flex, Spinner, Table } from '@radix-ui/themes';
-import { useFetchSimulationData } from 'hooks/useFetchSimulationData';
-import { useEffect, useState } from 'react';
+import { Box, Button, Flex, IconButton, Table } from '@radix-ui/themes';
 import Plot from 'react-plotly.js';
-import { Link } from 'react-router-dom';
-import { Routes } from 'routes';
-import { DataFrame, PlottedAgentData, SimulationData } from 'types/data';
+import { DataFrame, SimulationData } from 'types/data';
 
 export type SimulationViewerProps = {
+  simulationIdx: number,
   simulationData: SimulationData,
+  onRemoveSimulation: (simulationIdx : number) => void,
+  onLoadParameters: (initialState : DataFrame) => void,
 }
 
-export function SimulationViewer({ simulationData } : SimulationViewerProps){
+export function SimulationViewer({ 
+  simulationData, 
+  onRemoveSimulation, 
+  simulationIdx,
+  onLoadParameters,
+} : SimulationViewerProps){
   const positionData = Object.values(simulationData.positions);
   const velocityData = Object.values(simulationData.velocities);
   const initialState = simulationData.data[0][2];
 
   return (
     <Flex direction="column" m="4" justify="center" align="center">
+      <Flex width="100%" justify="end">
+        <IconButton
+          type="button"
+          variant="ghost"
+          color="gray"
+          size="1"
+          onClick={() => onRemoveSimulation(simulationIdx)}
+          aria-label={`Remove simulation #${simulationIdx + 1}`}
+        >
+          ×
+        </IconButton>
+      </Flex>
       <Flex direction="row" width="100%" justify="center">
         <Plot
           style={{
@@ -68,41 +84,53 @@ export function SimulationViewer({ simulationData } : SimulationViewerProps){
         />
       </Flex>
       <Flex justify="center" width="100%" m="4">
-        <Table.Root
-          style={{
-            width: '800px',
-          }}
-        >
-          {/* Table: https://www.radix-ui.com/themes/docs/components/table */}
-          <Table.Header>
-            <Table.Row>
-              <Table.ColumnHeaderCell>Agent</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Initial Position (x,y, z)</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Initial Velocity (x,y,z)</Table.ColumnHeaderCell>
-            </Table.Row>
-          </Table.Header>
-
-          <Table.Body>
-            {Object.entries(initialState).flatMap(
-                ([agentId, { position, velocity }]) => {
-                  if (position) {
-                  return (
-              <Table.Row key={agentId}>
-                <Table.RowHeaderCell>{agentId}</Table.RowHeaderCell>
-                <Table.Cell>
-                  ({position.x}, {position.y}, {position.z})
-                </Table.Cell>
-                <Table.Cell>
-                  ({velocity.x}, {velocity.y}, {velocity.z})
-                </Table.Cell>
+        <Box>
+          <Table.Root
+            style={{
+              width: '800px',
+              marginBottom: '1rem'
+            }}
+          >
+            {/* Table: https://www.radix-ui.com/themes/docs/components/table */}
+            <Table.Header>
+              <Table.Row>
+                <Table.ColumnHeaderCell>Agent</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Initial Position (x,y, z)</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Initial Velocity (x,y,z)</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Mass</Table.ColumnHeaderCell>
               </Table.Row>
-                );} else {
-                  return null;
+            </Table.Header>
+
+            <Table.Body>
+              {Object.entries(initialState).flatMap(
+                  ([agentId, { position, velocity, mass }]) => {
+                    if (position) {
+                    return (
+                <Table.Row key={agentId}>
+                  <Table.RowHeaderCell>{agentId}</Table.RowHeaderCell>
+                  <Table.Cell>
+                    ({position.x}, {position.y}, {position.z})
+                  </Table.Cell>
+                  <Table.Cell>
+                    ({velocity.x}, {velocity.y}, {velocity.z})
+                  </Table.Cell>
+                  <Table.Cell>
+                    ({mass})
+                  </Table.Cell>
+                </Table.Row>
+                  );} else {
+                    return null;
+                  }
                 }
-              }
-            )}
-          </Table.Body>
-        </Table.Root>
+              )}
+            </Table.Body>
+          </Table.Root>
+          <Button 
+            onClick={() => onLoadParameters(initialState)} 
+            aria-label={`Load Agent Parameters for Simulation ${simulationIdx + 1}`}>
+              Load Agent Parameters
+          </Button>
+        </Box>
       </Flex>
     </Flex>
   );

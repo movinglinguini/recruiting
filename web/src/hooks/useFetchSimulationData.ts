@@ -73,7 +73,6 @@ async function fetchSimulation() : Promise<SimulationData | null> {
 
 export function useFetchSimulationData(formData: FormData | null, callback : (data : SimulationData | null) => void) {
   useEffect(() => {
-    console.log(formData);
     let canceled = false;
 
     if (!formData) {

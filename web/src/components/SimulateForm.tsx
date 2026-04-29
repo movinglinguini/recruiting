@@ -1,7 +1,8 @@
 import { Form, FormField, FormLabel } from '@radix-ui/react-form';
 import { Button, Container, Flex, Heading, IconButton, Spinner, Text, TextField } from '@radix-ui/themes';
 import _ from 'lodash';
-import React, { FormEvent, memo, useCallback, useState } from 'react';
+import React, { FormEvent, forwardRef, memo, useCallback, useImperativeHandle, useState } from 'react';
+import { AgentConfigIO } from 'components/AgentConfigIO';
 import { BodyData, FormData, FormValue } from 'types/formData';
 
 const FIELDS: { label: string; path: string }[] = [
@@ -36,8 +37,20 @@ export type SimulateFormProps = {
   onSubmitForm: (formData : FormData) => void,
 }
 
-const SimulateForm = memo(({ isLoading, onSubmitForm } : SimulateFormProps) => {
+export type SimulateFormHandle = {
+  loadFormData: (data: FormData) => void;
+};
+
+const SimulateForm = memo(forwardRef<SimulateFormHandle, SimulateFormProps>(({ isLoading, onSubmitForm }, ref) => {
   const [formData, setFormData] = useState<FormData>(initialFormData);
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+
+  const handleLoad = useCallback((data: FormData) => {
+    setFormData(data);
+    setCollapsed(new Set());
+  }, []);
+
+  useImperativeHandle(ref, () => ({ loadFormData: handleLoad }), [handleLoad]);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -55,6 +68,21 @@ const SimulateForm = memo(({ isLoading, onSubmitForm } : SimulateFormProps) => {
       delete next[id];
       return next;
     });
+    setCollapsed((prev) => {
+      if (!prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  }, []);
+
+  const toggleCollapsed = useCallback((id: string) => {
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   }, []);
 
   const handleSubmit = useCallback((evt: FormEvent) => {
@@ -67,41 +95,56 @@ const SimulateForm = memo(({ isLoading, onSubmitForm } : SimulateFormProps) => {
   return (
     <Container>
       <Form onSubmit={handleSubmit}>
-        {bodyIds.map((bodyId, i) => (
-          <Flex key={bodyId} direction="column" mt={i === 0 ? '0' : '4'}>
-            <Flex justify="between" align="center">
-              <Heading as="h2" size="4" weight="bold">{bodyId}</Heading>
-              <IconButton
-                type="button"
-                variant="ghost"
-                color="gray"
-                size="1"
-                onClick={() => handleRemoveBody(bodyId)}
-                aria-label={`Remove ${bodyId}`}
-              >
-                ×
-              </IconButton>
+        <AgentConfigIO formData={formData} onLoad={handleLoad} />
+        {bodyIds.map((bodyId, i) => {
+          const isCollapsed = collapsed.has(bodyId);
+          return (
+            <Flex key={bodyId} direction="column" mt={i === 0 ? '0' : '4'}>
+              <Flex justify="between" align="center">
+                <Flex
+                  align="center"
+                  gap="2"
+                  onClick={() => toggleCollapsed(bodyId)}
+                  style={{ cursor: 'pointer', userSelect: 'none' }}
+                  role="button"
+                  aria-expanded={!isCollapsed}
+                  aria-label={`${isCollapsed ? 'Expand' : 'Collapse'} ${bodyId}`}
+                >
+                  <Text size="2" color="gray">{isCollapsed ? '▸' : '▾'}</Text>
+                  <Heading as="h2" size="4" weight="bold">{bodyId}</Heading>
+                </Flex>
+                <IconButton
+                  type="button"
+                  variant="ghost"
+                  color="gray"
+                  size="1"
+                  onClick={() => handleRemoveBody(bodyId)}
+                  aria-label={`Remove ${bodyId}`}
+                >
+                  ×
+                </IconButton>
+              </Flex>
+              {!isCollapsed && FIELDS.map(({ label, path }) => {
+                const fieldName = `${bodyId}.${path}`;
+                return (
+                  <FormField key={fieldName} name={fieldName}>
+                    <FormLabel htmlFor={fieldName}>
+                      <Text size="1" color="gray">{label}</Text>
+                    </FormLabel>
+                    <TextField.Root
+                      type="number"
+                      id={fieldName}
+                      name={fieldName}
+                      value={_.get(formData, fieldName) as unknown as FormValue}
+                      onChange={handleChange}
+                      required
+                    />
+                  </FormField>
+                );
+              })}
             </Flex>
-            {FIELDS.map(({ label, path }) => {
-              const fieldName = `${bodyId}.${path}`;
-              return (
-                <FormField key={fieldName} name={fieldName}>
-                  <FormLabel htmlFor={fieldName}>
-                    <Text size="1" color="gray">{label}</Text>
-                  </FormLabel>
-                  <TextField.Root
-                    type="number"
-                    id={fieldName}
-                    name={fieldName}
-                    value={_.get(formData, fieldName) as unknown as FormValue}
-                    onChange={handleChange}
-                    required
-                  />
-                </FormField>
-              );
-            })}
-          </Flex>
-        ))}
+          );
+        })}
         <Flex justify="center" mt="4">
           <Button type="button" variant="soft" onClick={handleAddBody}>
             + Add Body
@@ -115,6 +158,6 @@ const SimulateForm = memo(({ isLoading, onSubmitForm } : SimulateFormProps) => {
       </Form>
     </Container>
   );
-});
+}));
 
 export default SimulateForm;

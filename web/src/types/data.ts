@@ -1,5 +1,12 @@
 // Input data from the simulation
-export type AgentData = Record<string, Record<string, number>>;
+export type Vec3 = { x: number; y: number; z: number };
+export type AgentData = {
+  position: Vec3;
+  velocity: Vec3;
+  mass: number;
+  time?: number;
+  timeStep?: number;
+};
 export type DataFrame = Record<string, AgentData>;
 export type DataPoint = [number, number, DataFrame];
 
